@@ -1,12 +1,14 @@
+export type Transformer<T extends Object, U> = (source: U) => T[keyof T];
+
 export const store = () => {
   const store = new Map();
 
   return {
-    setMetadata: <T extends { new (): InstanceType<T> }>(
+    setMetadata: <T extends Object, U>(
       target: T,
-      key: any,
-      func: any
-    ) => {
+      key: keyof T,
+      func: Transformer<T, U> | null
+    ): void => {
       if (store.has(target.constructor)) {
         const keyStore = store.get(target.constructor);
         if (keyStore.has(key)) {
@@ -21,15 +23,12 @@ export const store = () => {
       }
     },
 
-    getKeys: <T extends { new (): InstanceType<T> }>(target: T) => {
-      const keyStore: Map<any, any> = store.get(target);
+    getKeys: <T extends Object>(target: T) => {
+      const keyStore: Map<keyof T, unknown> = store.get(target);
       return keyStore.keys();
     },
 
-    getTransformer: <T extends { new (): InstanceType<T> }>(
-      target: T,
-      key: keyof T
-    ) => {
+    getTransformer: <T extends Object>(target: T, key: keyof T) => {
       const keyStore = store.get(target);
       if (keyStore) {
         return keyStore.get(key);

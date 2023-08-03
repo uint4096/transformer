@@ -2,17 +2,6 @@ import { expose, plainToInstance, transform } from "./index";
 
 describe("Transformer", () => {
   it("should transform an object to an instance", () => {
-    class User {
-      @transform((user) => parseInt(user.user_id, 10))
-      id: number;
-
-      @transform((user) => `${user.first_name} ${user.last_name}`)
-      name: string;
-
-      @expose()
-      email: string;
-    }
-
     const sourceUser = {
       email: "name@email.com",
       first_name: "Name",
@@ -20,7 +9,20 @@ describe("Transformer", () => {
       user_id: "122343",
     };
 
-    const transformedUser: User = plainToInstance(sourceUser, User);
+    class User {
+      @transform((user: typeof sourceUser) => parseInt(user.user_id, 10))
+      id: number;
+
+      @transform(
+        (user: typeof sourceUser) => `${user.first_name} ${user.last_name}`
+      )
+      name: string;
+
+      @expose()
+      email: string;
+    }
+
+    const transformedUser = plainToInstance(sourceUser, User);
     expect(transformedUser).toBeDefined();
     expect(transformedUser).toEqual(
       expect.objectContaining({
