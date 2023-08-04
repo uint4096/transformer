@@ -11,12 +11,7 @@ export const store = () => {
     ): void => {
       if (store.has(target.constructor)) {
         const keyStore = store.get(target.constructor);
-        if (keyStore.has(key)) {
-          const transformerStore = keyStore.get(key);
-          transformerStore.set(key, func);
-        } else {
-          keyStore.set(key, func);
-        }
+        keyStore.set(key, func);
       } else {
         const keyStore = new Map().set(key, func);
         store.set(target.constructor, keyStore);
